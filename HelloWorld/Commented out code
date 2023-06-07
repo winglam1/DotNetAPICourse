@@ -1,0 +1,170 @@
+// Console.WriteLine("Hello C# Programmers");
+// Console.Write("First");
+// Console.Write("Second");
+// Console.WriteLine("Hello C# Programmers");
+
+// // chapter about classes
+// Computer myComputer = new Computer()
+// {
+//     Motherboard = "Z690",
+//     HasWifi = true,
+//     HasLTE = false,
+//     ReleaseDate = DateTime.Now,
+//     Price = 943.87m,
+//     VideoCard = "RTX 2060"
+// };     
+
+// chapter about Config
+// IConfiguration config = new ConfigurationBuilder()
+//     .AddJsonFile("appsettings.json")
+//     .Build();
+
+// // chapter about DB access
+// // string connectionString = "server=(localdb)\\MSSQLLocalDB;Database=DotNetCourseDatabase;TrustServerCertificate=true;Trusted_Connection=true;";
+
+// // IDbConnection dbConnection = new SqlConnection(connectionString);
+
+// DataContextDapper dapper = new DataContextDapper(config);
+// DataContextEF entityFramework = new DataContextEF(config);
+
+// string sqlCommand = "SELECT GETDATE()";
+// DateTime rightNow = dapper.LoadDataSingle<DateTime>(sqlCommand);
+
+// Console.WriteLine(rightNow.ToString());
+
+// entityFramework.Add(myComputer);
+// entityFramework.SaveChanges();
+
+
+//Console.WriteLine(args[0]);
+
+//Console.WriteLine(sql);
+
+//int result = dapper.ExecuteSqlWithRowCount(sql);
+//bool result = dapper.ExecuteSql(sql);
+
+//Console.WriteLine(result);
+
+// string sqlSelect = @"
+// SELECT   
+//     ComputerId,
+//     Motherboard,
+//     HasWifi,
+//     HasLTE,
+//     ReleaseDate,
+//     Price,
+//     VideoCard FROM [TutorialAppSchema].[Computer]";
+
+// IEnumerable<Computer> computers = dapper.LoadData<Computer>(sqlSelect);
+
+// Console.WriteLine("'ComputerId','Motherboard','HasWifi','HasLTE', ReleaseDate','Price','VideoCard'");
+// foreach (Computer singleComputer in computers)
+// {
+//     Console.WriteLine("'" + singleComputer.ComputerId
+//         + "','" + singleComputer.Motherboard
+//         + "','" + singleComputer.HasWifi
+//         + "','" + singleComputer.HasLTE
+//         + "','" + singleComputer.ReleaseDate?.ToString("yyyy-MM-dd")
+//         + "','" + singleComputer.Price
+//         + "','" + singleComputer.VideoCard + "'");
+// }
+
+// IEnumerable<Computer>? computersEf = entityFramework.Computer?.ToList<Computer>();
+
+// if (computersEf != null)
+// {
+//     Console.WriteLine("'ComputerId','Motherboard','HasWifi','HasLTE', ReleaseDate','Price','VideoCard'");
+//     foreach(Computer singleComputer in computersEf)
+//     {
+//         Console.WriteLine("'" + singleComputer.ComputerId
+//             + "','" + singleComputer.Motherboard
+//             + "','" + singleComputer.HasWifi
+//             + "','" + singleComputer.HasLTE
+//             + "','" + singleComputer.ReleaseDate?.ToString("yyyy-MM-dd")
+//             + "','" + singleComputer.Price
+//             + "','" + singleComputer.VideoCard + "'");
+//     }
+// }
+
+// Console.WriteLine(myComputer.Motherboard);
+// Console.WriteLine(myComputer.HasWifi);
+// Console.WriteLine(myComputer.VideoCard);
+// Console.WriteLine(myComputer.ReleaseDate);
+
+//         // chapter on basic changes to the layout of the console classes in ASP.Net Core 6
+//         Console.WriteLine("Hello World!");
+
+//         // chapter on types and the ranges
+//         //sbyte mySbyte = 127;
+//         //byte myByte = 255;
+
+//         // chapter on data structures such as arrays, lists and IEnumerables.
+//         List<string> myGroceryList = new List<string>() { "Milk", "Cheese"};
+
+//         myGroceryList.Add("Oranges");
+//         IEnumerable<string> myGroceryIEnumerable = myGroceryList;
+
+//         Console.WriteLine(myGroceryIEnumerable.First());
+
+//         string [,] myTwoDimensionalArray = new string [,] {
+//             { "Apples", "Eggs" },
+//             { "Milk", "Cheese" }
+//         };
+
+//         Console.WriteLine(myTwoDimensionalArray[1,1]);
+
+//         Dictionary<string, string> myGroceryDictionary = new Dictionary<string, string>(){
+//             {"Cheese", "Dairy"}
+//         };
+
+//         Console.WriteLine(myGroceryDictionary["Cheese"]);
+
+//         Dictionary<string, string[]> myGroceryMultiDictionary = new Dictionary<string, string[]>(){
+//             {"Dairy", new string[]{"Cheese", "Milk", "Eggs"}}
+//         };
+
+//         Console.WriteLine(myGroceryMultiDictionary["Dairy"][2]);
+
+//         // chapter to show operators
+//         // AND and OR (&& and ||) are operators that only evaluates the first comparison and it then decides on whether it is true or false.
+
+//         // chapter to show conditional statements
+//         // ran throush if and switch statements
+
+//         // chapter to Loops
+//         // run through the loop constructs combine with if constructs and the speed they executes
+//         // foreach loop was much faster than a for loop which is much faster to just adding indexed numbers in an array
+//         // even faster is a while loop, but do while loop is the slowest of all!
+//         // sum method is not as fast as a foreach or while loop constructs
+
+//         //chapter about methods
+//         DateTime startTime = DateTime.Now;
+
+//         int[] intsToCompress = new int[] {10, 15, 20, 25, 30, 12, 34};
+//         int totalValue = GetSum(intsToCompress);
+
+//         Console.WriteLine((DateTime.Now - startTime).TotalSeconds);
+//         Console.WriteLine(totalValue);
+
+//         // chapter about scope
+//         // the deepest level of scope is what each interaction takes precedent
+//         // also can't declare any variables of the same name with the same case in the same scope
+//     }
+
+//     static private int GetSum(int[] intsToCompress)
+//     {
+//         //int[] intsToCompress = new int[] {10, 15, 20, 25, 30, 12, 34};
+//         int totalValue = 0;
+
+//         foreach (int intForCompression in intsToCompress) 
+//         {
+//             totalValue += intForCompression;
+//         }
+
+//         if (totalValue > 400)
+//         {
+//             return totalValue;
+//         }
+
+//         return totalValue;
+//     }
