@@ -48,8 +48,6 @@ namespace DotnetAPI.Controllers
                         [PasswordSalt]) VALUES('" + userForRegistration.Email +
                         "', @PasswordHash, @PasswordSalt)";
 
-Console.WriteLine("sqlAddAuth is ", sqlAddAuth);
-
                     List<SqlParameter> sqlParameters = new List<SqlParameter>();
 
                     SqlParameter passwordHashParameter = new SqlParameter("@PasswordHash", SqlDbType.VarBinary);
@@ -63,7 +61,24 @@ Console.WriteLine("sqlAddAuth is ", sqlAddAuth);
 
                     if (_dapper.ExecuteSqlWithParameters(sqlAddAuth, sqlParameters))
                     {
-                        return Ok();
+                        string sqlAddUser = @"INSERT INTO TutorialAppSchema.Users(
+                            [FirstName],
+                            [LastName],
+                            [Email],
+                            [Gender],
+                            [Active]
+                        ) VALUES (" +
+                            "'" + userForRegistration.FirstName +
+                            "','" + userForRegistration.LastName +
+                            "','" + userForRegistration.Email +
+                            "','" + userForRegistration.Gender +
+                            "', 1)";
+
+                        if (_dapper.ExecuteSql(sqlAddUser))
+                        {
+                            return Ok();
+                        }
+                        throw new Exception("Failed to add user.");
                     }
                     throw new Exception("Failed to register user.");
                 }
