@@ -1,16 +1,23 @@
 using System.Collections.Generic;
 using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using DotnetAPI.Data;
 using DotnetAPI.DTOs;
 using DotnetAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DotnetAPI.Controllers
 {    
+    [Authorize]
+    [ApiController]
+    [Route("[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly DataContextDapper _dapper;
@@ -22,6 +29,7 @@ namespace DotnetAPI.Controllers
             _config = config;
         }
 
+        [AllowAnonymous]
         [HttpPost("Register")]
         public IActionResult Register(UserForRegistrationDto userForRegistration)
         {
@@ -61,18 +69,19 @@ namespace DotnetAPI.Controllers
 
                     if (_dapper.ExecuteSqlWithParameters(sqlAddAuth, sqlParameters))
                     {
-                        string sqlAddUser = @"INSERT INTO TutorialAppSchema.Users(
-                            [FirstName],
-                            [LastName],
-                            [Email],
-                            [Gender],
-                            [Active]
-                        ) VALUES (" +
-                            "'" + userForRegistration.FirstName +
-                            "','" + userForRegistration.LastName +
-                            "','" + userForRegistration.Email +
-                            "','" + userForRegistration.Gender +
-                            "', 1)";
+                        string sqlAddUser = @"
+                            INSERT INTO TutorialAppSchema.Users(
+                                [FirstName],
+                                [LastName],
+                                [Email],
+                                [Gender],
+                                [Active]
+                            ) VALUES (" +
+                                "'" + userForRegistration.FirstName +
+                                "','" + userForRegistration.LastName +
+                                "','" + userForRegistration.Email +
+                                "','" + userForRegistration.Gender +
+                                "', 1)";
 
                         if (_dapper.ExecuteSql(sqlAddUser))
                         {
@@ -87,6 +96,7 @@ namespace DotnetAPI.Controllers
             throw new Exception("Passwords do not match!");
         }
 
+        [AllowAnonymous]
         [HttpPost("Login")]
         public IActionResult Login(UserForLoginDto userForLogin)
         {
@@ -95,8 +105,8 @@ namespace DotnetAPI.Controllers
                 [PasswordSalt] FROM TutorialAppSchema.Auth WHERE Email = '" +
                 userForLogin.Email + "'";
 
-                UserForLoginConfirmationDto userForConfirmation = _dapper
-                    .LoadDataSingle<UserForLoginConfirmationDto>(sqlForHashAndSalt);
+            UserForLoginConfirmationDto userForConfirmation = _dapper
+                .LoadDataSingle<UserForLoginConfirmationDto>(sqlForHashAndSalt);
 
             byte[] passwordHash = GetPasswordHash(userForLogin.Password, 
                 userForConfirmation.PasswordSalt);
@@ -110,7 +120,27 @@ namespace DotnetAPI.Controllers
                 }
             }
 
-            return Ok();
+            string userIdSql = @"
+                SELECT UserId FROM TutorialAppSchema.Users WHERE Email = '" + 
+                userForLogin.Email + "'";
+
+            int userId = _dapper.LoadDataSingle<int>(userIdSql);
+
+            return Ok(new Dictionary<string, string> {
+                {"token", CreateToken(userId)}
+            });
+        }
+
+        [HttpGet("RefreshToken")]
+        public string RefreshToken()
+        {
+            string userIdSql = @"
+                SELECT UserId FROM TutorialAppSchema.Users WHERE UserId = '" +
+                User.FindFirst("userId")?.Value + "'";
+
+            int userId = _dapper.LoadDataSingle<int>(userIdSql);
+
+            return CreateToken(userId);
         }
 
         private byte[] GetPasswordHash(string password, byte[] passwordSalt)
@@ -125,6 +155,39 @@ namespace DotnetAPI.Controllers
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8
             );
+        }
+
+        private string CreateToken(int userId)
+        {
+            Claim[] claims = new Claim[] {
+                new Claim("userId", userId.ToString())
+            };
+
+            string? tokenKeyString = _config.GetSection("AppSettings:Token").Value;
+
+            SymmetricSecurityKey tokenKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(
+                    tokenKeyString != null ? tokenKeyString : ""
+                )
+            );            
+
+            SigningCredentials credentials = new SigningCredentials(
+                tokenKey, 
+                SecurityAlgorithms.HmacSha512Signature
+            );
+
+            SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor()
+            {
+                Subject = new ClaimsIdentity(claims),
+                SigningCredentials = credentials,
+                Expires = DateTime.Now.AddDays(1)
+            };
+
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+
+            SecurityToken token = tokenHandler.CreateToken(descriptor);
+
+            return tokenHandler.WriteToken(token);
         }
     }
 }
