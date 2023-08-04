@@ -65,8 +65,8 @@ namespace DotnetAPI.Controllers
             return _dapper.LoadData<Post>(sql);
         }
 
-        [HttpGet("MyPosts")]
-        public IEnumerable<Post> GetMyPosts()
+        [HttpGet("PostsBySearch/{searchParam}")]
+        public IEnumerable<Post> PostsBySearch(string searchParam)
         {
             string sql = @"SELECT [PostId]
                     ,[UserId]
@@ -75,8 +75,8 @@ namespace DotnetAPI.Controllers
                     ,[PostCreated]
                     ,[PostUpdated]
                 FROM [DotNetCourseDatabase].[TutorialAppSchema].[Posts]
-                WHERE
-                    UserId = " + this.User.FindFirst("userId")?.Value;
+                WHERE PostTitle LIKE '%" + searchParam + "%'" +
+                    " OR PostContent LIKE '%" + searchParam + "%'";
 
             return _dapper.LoadData<Post>(sql);
         }
