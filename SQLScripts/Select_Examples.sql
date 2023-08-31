@@ -75,3 +75,5 @@ SELECT TOP (1000) [UserId]
   SELECT * FROM TutorialAppSchema.Users
   WHERE UserId IN (37, 2002)
   ORDER BY userId DESC
+
+  SELECT UserId FROM TutorialAppSchema.Users WHERE Email = 'test2@test.com'

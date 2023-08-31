@@ -1,6 +1,10 @@
 USE DotNetCourseDatabase;
 GO
 
+SELECT * FROM TutorialAppSchema.Posts
+    WHERE PostTitle LIKE '%search%'
+        OR PostContent LIKE '%search%'
+
 CREATE TABLE TutorialAppSchema.Users
 (
     UserId INT IDENTITY(1, 1) PRIMARY KEY
