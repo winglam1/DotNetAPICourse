@@ -5,7 +5,8 @@ CREATE OR ALTER PROCEDURE TutorialAppSchema.spPosts_Get
 /* EXEC TutorialAppSchema.spPosts_Get @UserId = 2003, @SearchValue = 'First' */
 /* EXEC TutorialAppSchema.spPosts_Get @UserId = 2003 */
     @UserId INT = NULL,
-    @SearchValue NVARCHAR(MAX) = NULL
+    @SearchValue NVARCHAR(MAX) = NULL,
+    @PostId INT = NULL
 AS
 BEGIN
     SELECT [Posts].[PostId],
@@ -18,6 +19,8 @@ BEGIN
         TutorialAppSchema.Posts AS Posts
     WHERE 
         Posts.UserId = ISNULL(@UserId, Posts.UserId)
+    AND
+        Posts.PostId = ISNULL(@PostId, Posts.PostId)
     AND
         (@SearchValue IS NULL 
         OR Posts.PostContent LIKE '%' + @SearchValue + '%'
