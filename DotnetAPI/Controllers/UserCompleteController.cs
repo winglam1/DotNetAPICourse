@@ -66,8 +66,6 @@ public class UserCompleteController : ControllerBase
             @Salary = @SalaryParameter,
             @UserId = @UserIdParameter";
 
-Console.WriteLine(sql);
-
         DynamicParameters sqlParameters = new();
 
         sqlParameters.Add("@FirstNameParameter", user.FirstName, DbType.String);
